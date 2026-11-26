@@ -19,7 +19,7 @@ class SlotRepository(context: Context) {
             ?: return List(GRID_SIZE) { Slot(it, "Sonido ${it + 1}") }
 
         val arr = JSONArray(raw)
-        return List(arr.length()) { i ->
+        val saved = List(arr.length()) { i ->
             val o = arr.getJSONObject(i)
             Slot(
                 id = o.getInt("id"),
@@ -27,6 +27,9 @@ class SlotRepository(context: Context) {
                 audioUri = o.optString("uri").takeIf { it.isNotEmpty() },
             )
         }
+        // Si la app se guardó con menos botones (p. ej. 12), completa hasta GRID_SIZE.
+        val extra = (saved.size until GRID_SIZE).map { Slot(it, "Sonido ${it + 1}") }
+        return saved + extra
     }
 
     fun save(slots: List<Slot>) {
@@ -44,7 +47,7 @@ class SlotRepository(context: Context) {
 
     companion object {
         private const val KEY = "slots"
-        const val GRID_SIZE = 12
+        const val GRID_SIZE = 30
     }
 }
 
